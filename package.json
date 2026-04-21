@@ -1,0 +1,14 @@
+{
+  "name": "crudo-ecommerce-kit",
+  "version": "1.0.0",
+  "description": "Starter kit e-commerce para marcas de indumentaria argentina — React + Node.js + MercadoPago",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "cd frontend && npm run dev",
+    "dev:server": "cd backend && npm run dev",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
