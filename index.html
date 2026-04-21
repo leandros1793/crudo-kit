@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRUDO® — Starter Kit Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --negro: #080808;
+  --negro2: #101010;
+  --negro3: #181818;
+  --borde: rgba(255,255,255,0.06);
+  --borde2: rgba(255,255,255,0.12);
+  --texto: #f2f0eb;
+  --apagado: #666;
+  --muy-apagado: #333;
+  --rojo: #e63946;
+  --rojo-bg: rgba(230,57,70,0.1);
+  --verde: #2ec4b6;
+  --verde-bg: rgba(46,196,182,0.08);
+  --mp-azul: #009ee3;
+  --mp-bg: rgba(0,158,227,0.1);
+  --amarillo: #f4c430;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Space Grotesk', sans-serif; background: var(--negro); color: var(--texto); min-height: 100vh; overflow-x: hidden; }
+
+/* GRAIN OVERLAY */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.4;
+}
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 24px; height: 56px;
+  background: rgba(8,8,8,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--borde);
+}
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px; letter-spacing: 0.12em;
+  color: var(--texto);
+}
+.logo span { color: var(--rojo); }
+.nav-center { display: flex; gap: 2px; }
+.nav-tab {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--apagado);
+  padding: 6px 14px; border-radius: 4px;
+  cursor: pointer; border: none; background: transparent;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: color 0.15s, background 0.15s;
+}
+.nav-tab:hover { color: var(--texto); background: var(--negro3); }
+.nav-tab.active { color: var(--texto); background: var(--negro3); }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.cart-trigger {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 16px;
+  border: 1px solid var(--borde2);
+  background: transparent; border-radius: 4px;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.06em;
+  color: var(--texto); cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  text-transform: uppercase;
+  transition: border-color 0.15s, background 0.15s;
+}
+.cart-trigger:hover { border-color: var(--rojo); background: var(--rojo-bg); }
+.cart-badge {
+  background: var(--rojo); color: #fff;
+  border-radius: 50%; width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+}
+
+/* VIEWS */
+.view { display: none; position: relative; z-index: 1; }
+.view.active { display: block; }
+
+/* HERO */
+.hero {
+  padding: 60px 24px 48px;
+  border-bottom: 1px solid var(--borde);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+  max-width: 1100px; margin: 0 auto;
+}
+.hero-eyebrow {
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--rojo); margin-bottom: 12px; font-weight: 500;
+}
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 72px; line-height: 0.95; letter-spacing: 0.04em;
+  color: var(--texto); margin-bottom: 20px;
+}
+.hero-title em { color: var(--rojo); font-style: normal; }
+.hero-sub {
+  font-size: 15px; color: var(--apagado); line-height: 1.7;
+  max-width: 400px; margin-bottom: 28px;
+}
+.hero-cta {
+  display: inline-block; padding: 12px 28px;
+  background: var(--rojo); color: #fff;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; border: none; border-radius: 3px;
+  cursor: pointer; font-family: 'Space Grotesk', sans-serif;
+  transition: opacity 0.15s;
+}
+.hero-cta:hover { opacity: 0.85; }
+.hero-visual {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.hero-card {
+  background: var(--negro2); border: 1px solid var(--borde);
+  border-radius: 6px; aspect-ratio: 3/4;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 14px; font-size: 60px; overflow: hidden;
+  position: relative;
+}
+.hero-card:first-child { margin-top: 24px; }
+.hero-card-emoji { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-60%); font-size: 56px; }
+.hero-card-name { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--texto); position: relative; }
+.hero-card-price { font-size: 13px; color: var(--rojo); font-weight: 500; position: relative; }
+
+/* CATALOG */
+.catalog-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+.catalog-toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px; gap: 12px; flex-wrap: wrap;
+}
+.catalog-title-row { display: flex; align-items: baseline; gap: 12px; }
+.catalog-h { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.06em; }
+.catalog-count { font-size: 12px; color: var(--apagado); }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-btn {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 3px;
+  border: 1px solid var(--borde2); background: transparent;
+  color: var(--apagado); cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all 0.15s;
+}
+.filter-btn:hover { border-color: var(--texto); color: var(--texto); }
+.filter-btn.active { background: var(--texto); color: var(--negro); border-color: var(--texto); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.prod {
+  background: var(--negro2);
+  border: 1px solid var(--borde);
+  border-radius: 6px; overflow: hidden;
+  cursor: pointer; transition: border-color 0.15s, transform 0.15s;
+  animation: fadeUp 0.3s ease both;
+}
+.prod:hover { border-color: var(--borde2); transform: translateY(-2px); }
+.prod-img {
+  aspect-ratio: 3/4; background: var(--negro3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 64px; position: relative; overflow: hidden;
+}
+.prod-img::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(8,8,8,0.6) 0%, transparent 50%);
+}
+.prod-badge {
+  position: absolute; top: 10px; left: 10px; z-index: 1;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 2px;
+}
+.badge-new { background: var(--rojo); color: #fff; }
+.badge-hot { background: var(--amarillo); color: #000; }
+.badge-last { background: var(--negro3); color: var(--apagado); border: 1px solid var(--borde2); }
+.prod-body { padding: 12px 14px 14px; }
+.prod-name { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--texto); margin-bottom: 3px; }
+.prod-desc { font-size: 11px; color: var(--apagado); margin-bottom: 10px; line-height: 1.4; }
+.prod-bottom { display: flex; justify-content: space-between; align-items: center; }
+.prod-price { font-size: 16px; font-weight: 700; color: var(--texto); }
+.prod-price span { font-size: 10px; color: var(--apagado); font-weight: 400; }
+.add-btn {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 6px 12px; border-radius: 3px;
+  border: 1px solid var(--borde2); background: transparent;
+  color: var(--apagado); cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all 0.15s;
+}
+.add-btn:hover { border-color: var(--rojo); color: var(--rojo); background: var(--rojo-bg); }
+.add-btn.added { border-color: var(--verde); color: var(--verde); background: var(--verde-bg); }
+
+/* CART VIEW */
+.cart-wrap { max-width: 680px; margin: 0 auto; padding: 32px 24px; }
+.cart-h { font-family: 'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 0.06em; margin-bottom: 24px; }
+.cart-empty { text-align: center; padding: 60px 20px; color: var(--apagado); }
+.cart-empty-icon { font-size: 48px; display: block; margin-bottom: 12px; }
+.cart-empty-text { font-size: 14px; }
+
+.cart-item {
+  display: flex; gap: 14px; align-items: center;
+  padding: 16px 0; border-bottom: 1px solid var(--borde);
+}
+.ci-img {
+  width: 64px; height: 80px; flex-shrink: 0;
+  background: var(--negro3); border: 1px solid var(--borde);
+  border-radius: 4px; display: flex; align-items: center;
+  justify-content: center; font-size: 30px;
+}
+.ci-info { flex: 1; min-width: 0; }
+.ci-name { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--texto); }
+.ci-variant { font-size: 11px; color: var(--apagado); margin-top: 2px; }
+.ci-price { font-size: 13px; color: var(--apagado); margin-top: 4px; }
+.ci-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.ci-subtotal { font-size: 14px; font-weight: 700; color: var(--texto); }
+.qty-row { display: flex; align-items: center; gap: 10px; }
+.qty-btn {
+  width: 28px; height: 28px; border-radius: 3px;
+  border: 1px solid var(--borde2); background: transparent;
+  color: var(--texto); font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: border-color 0.15s;
+}
+.qty-btn:hover { border-color: var(--rojo); color: var(--rojo); }
+.qty-num { font-size: 14px; font-weight: 700; min-width: 20px; text-align: center; }
+
+.cart-summary {
+  background: var(--negro2); border: 1px solid var(--borde);
+  border-radius: 6px; padding: 20px 22px; margin-top: 24px;
+}
+.sum-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--apagado); margin-bottom: 10px; }
+.sum-envio { color: var(--verde); }
+.sum-total { display: flex; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--borde); margin-top: 6px; }
+.sum-total-label { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.06em; }
+.sum-total-val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.04em; color: var(--texto); }
+
+.mp-btn {
+  width: 100%; margin-top: 16px; padding: 14px;
+  background: var(--mp-azul); color: #fff;
+  border: none; border-radius: 4px;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  font-family: 'Space Grotesk', sans-serif; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: opacity 0.15s;
+}
+.mp-btn:hover { opacity: 0.9; }
+.mp-logo { font-size: 11px; background: #fff; color: var(--mp-azul); padding: 2px 7px; border-radius: 3px; font-weight: 900; letter-spacing: 0; }
+.mp-note { text-align: center; font-size: 11px; color: var(--apagado); margin-top: 10px; }
+
+.cuotas-box {
+  margin-top: 12px; padding: 10px 14px;
+  background: var(--mp-bg); border: 1px solid rgba(0,158,227,0.2);
+  border-radius: 4px; font-size: 12px; color: #60c8f5;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* LOOKBOOK */
+.look-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+.look-h { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.06em; margin-bottom: 24px; }
+.look-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; }
+.look-cell {
+  background: var(--negro2); border: 1px solid var(--borde);
+  border-radius: 6px; overflow: hidden; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 80px; cursor: pointer; transition: border-color 0.15s;
+}
+.look-cell:hover { border-color: var(--borde2); }
+.look-cell:first-child { grid-row: span 2; aspect-ratio: auto; min-height: 420px; font-size: 120px; }
+.look-cell:not(:first-child) { aspect-ratio: 1; }
+.look-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 14px 16px;
+  background: linear-gradient(to top, rgba(8,8,8,0.9) 0%, transparent 100%);
+}
+.look-name { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--texto); }
+.look-price { font-size: 12px; color: var(--rojo); font-weight: 500; }
+
+/* FOOTER TECH BAR */
+.tech-bar {
+  position: sticky; bottom: 0; z-index: 50;
+  background: rgba(8,8,8,0.97); border-top: 1px solid var(--borde);
+  padding: 10px 24px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+}
+.tech-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muy-apagado); margin-right: 4px; font-weight: 500; }
+.tech-pill {
+  font-size: 10px; padding: 3px 10px; border-radius: 3px;
+  border: 1px solid var(--borde); color: var(--muy-apagado);
+  font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.04em;
+}
+.tech-pill.hi { border-color: rgba(230,57,70,0.3); color: var(--rojo); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 60px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--negro3); border: 1px solid var(--borde2);
+  color: var(--texto); padding: 10px 20px; border-radius: 4px;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.04em;
+  opacity: 0; pointer-events: none; z-index: 999;
+  transition: all 0.2s; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ANIMACIONES */
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--negro); }
+::-webkit-scrollbar-thumb { background: var(--muy-apagado); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">CRUDO<span>®</span></div>
+  <div class="nav-center">
+    <button class="nav-tab active" onclick="showView('home', this)">Inicio</button>
+    <button class="nav-tab" onclick="showView('catalog', this)">Productos</button>
+    <button class="nav-tab" onclick="showView('lookbook', this)">Lookbook</button>
+  </div>
+  <div class="nav-right">
+    <button class="cart-trigger" onclick="showView('cart', null)">
+      Bolsa <span class="cart-badge" id="cart-count">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div class="view active" id="v-home">
+  <div class="hero">
+    <div>
+      <p class="hero-eyebrow">Nueva temporada — Buenos Aires</p>
+      <h1 class="hero-title">USALO<br>EN LA<br><em>CALLE</em></h1>
+      <p class="hero-sub">Ropa que resiste el AMBA. Sin logos innecesarios, sin hype importado. Streetwear argento hecho para durar.</p>
+      <button class="hero-cta" onclick="showView('catalog', document.querySelectorAll('.nav-tab')[1])">Ver colección</button>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card" style="background:#111">
+        <div class="hero-card-emoji">🧥</div>
+        <div class="hero-card-name">Campera Cargo</div>
+        <div class="hero-card-price">$89.990</div>
+      </div>
+      <div class="hero-card" style="background:#0e0e0e">
+        <div class="hero-card-emoji">👟</div>
+        <div class="hero-card-name">Zapatilla Low</div>
+        <div class="hero-card-price">$74.500</div>
+      </div>
+    </div>
+  </div>
+  <!-- BANNER PROMO -->
+  <div style="background:var(--rojo);padding:10px 24px;text-align:center;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;">
+    Envío gratis a todo el país en compras +$80.000 — Pagá en hasta 12 cuotas sin interés con Mercado Pago
+  </div>
+</div>
+
+<!-- CATALOG -->
+<div class="view" id="v-catalog">
+  <div class="catalog-wrap">
+    <div class="catalog-toolbar">
+      <div class="catalog-title-row">
+        <h2 class="catalog-h">Productos</h2>
+        <span class="catalog-count" id="prod-count">8 prendas</span>
+      </div>
+      <div class="filters">
+        <button class="filter-btn active" onclick="filter('todo', this)">Todo</button>
+        <button class="filter-btn" onclick="filter('superior', this)">Superior</button>
+        <button class="filter-btn" onclick="filter('inferior', this)">Inferior</button>
+        <button class="filter-btn" onclick="filter('abrigos', this)">Abrigos</button>
+        <button class="filter-btn" onclick="filter('calzado', this)">Calzado</button>
+      </div>
+    </div>
+    <div class="grid" id="prod-grid"></div>
+  </div>
+</div>
+
+<!-- LOOKBOOK -->
+<div class="view" id="v-lookbook">
+  <div class="look-wrap">
+    <h2 class="look-h">Lookbook — Otoño 25</h2>
+    <div class="look-grid" id="look-grid"></div>
+  </div>
+</div>
+
+<!-- CART -->
+<div class="view" id="v-cart">
+  <div class="cart-wrap">
+    <h2 class="cart-h">Tu bolsa</h2>
+    <div id="cart-body"></div>
+  </div>
+</div>
+
+<div class="tech-bar">
+  <span class="tech-label">Stack:</span>
+  <span class="tech-pill hi">React 18</span>
+  <span class="tech-pill hi">Node.js + Express</span>
+  <span class="tech-pill hi">MercadoPago SDK</span>
+  <span class="tech-pill">Supabase</span>
+  <span class="tech-pill">Vercel</span>
+  <span class="tech-pill">Railway</span>
+  <span class="tech-pill">ARS nativo</span>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PRODUCTS = [
+  { id:1, cat:'abrigos', name:'Campera Cargo', desc:'Tela resistente al viento. 4 bolsillos.', price:89990, emoji:'🧥', badge:'new', talle:'M / L / XL' },
+  { id:2, cat:'superior', name:'Buzo Oversize', desc:'Algodón 340g. Fit holgado, puños canale.', price:47500, emoji:'👕', badge:'hot', talle:'S / M / L / XL' },
+  { id:3, cat:'inferior', name:'Cargo Baggy', desc:'Rip-stop con refuerzo en rodilla.', price:62000, emoji:'👖', badge:null, talle:'28 / 30 / 32 / 34' },
+  { id:4, cat:'calzado', name:'Zapatilla Low', desc:'Suela vulcanizada. Lona premium.', price:74500, emoji:'👟', badge:'hot', talle:'39 / 40 / 41 / 42 / 43' },
+  { id:5, cat:'superior', name:'Remera Pesada', desc:'Jersey 220g. Cuello canalé ancho.', price:28900, emoji:'🎽', badge:null, talle:'S / M / L / XL' },
+  { id:6, cat:'abrigos', name:'Chaleco Técnico', desc:'Relleno sintético. Liviano y cálido.', price:71000, emoji:'🦺', badge:'last', talle:'M / L' },
+  { id:7, cat:'inferior', name:'Short Cargo', desc:'6 bolsillos. Tela Taslan.', price:38500, emoji:'🩳', badge:null, talle:'S / M / L / XL' },
+  { id:8, cat:'calzado', name:'Bota Urbana', desc:'Caña media. Suela dentada antideslizante.', price:95000, emoji:'🥾', badge:'new', talle:'39 / 40 / 41 / 42' },
+];
+
+const LOOK = [
+  { id:1, emoji:'🧥', name:'Look Invierno', price:'$89.990' },
+  { id:2, emoji:'👟', name:'Calzado', price:'$74.500' },
+  { id:4, emoji:'👖', name:'Inferior', price:'$62.000' },
+  { id:3, emoji:'🎽', name:'Superior', price:'$28.900' },
+];
+
+let cart = [], currentCat = 'todo';
+
+const fmt = n => '$' + Math.round(n).toLocaleString('es-AR');
+
+function renderProducts() {
+  const filtered = currentCat === 'todo' ? PRODUCTS : PRODUCTS.filter(p => p.cat === currentCat);
+  document.getElementById('prod-count').textContent = filtered.length + ' prendas';
+  document.getElementById('prod-grid').innerHTML = filtered.map((p, i) => {
+    const inCart = cart.find(x => x.id === p.id);
+    const badgeHTML = p.badge ? `<span class="prod-badge badge-${p.badge}">${p.badge === 'new' ? 'Nuevo' : p.badge === 'hot' ? '🔥 Hot' : 'Últimos'}</span>` : '';
+    return `<div class="prod" style="animation-delay:${i*0.05}s">
+      <div class="prod-img">
+        ${badgeHTML}
+        <span>${p.emoji}</span>
+      </div>
+      <div class="prod-body">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-desc">${p.desc}</div>
+        <div class="prod-bottom">
+          <div class="prod-price">${fmt(p.price)} <span>ARS</span></div>
+          <button class="add-btn ${inCart ? 'added' : ''}" onclick="addToCart(${p.id})">
+            ${inCart ? '✓ Agregado' : '+ Bolsa'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderLookbook() {
+  document.getElementById('look-grid').innerHTML = LOOK.map(l => `
+    <div class="look-cell">
+      <span>${l.emoji}</span>
+      <div class="look-overlay">
+        <div class="look-name">${l.name}</div>
+        <div class="look-price">${l.price}</div>
+      </div>
+    </div>`).join('');
+}
+
+function filter(cat, el) {
+  currentCat = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderProducts();
+}
+
+function addToCart(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  const ex = cart.find(x => x.id === id);
+  if (ex) ex.qty++; else cart.push({ ...p, qty: 1 });
+  updateCount();
+  renderProducts();
+  showToast('✓  ' + p.name + ' agregado a tu bolsa');
+}
+
+function changeQty(id, d) {
+  const ex = cart.find(x => x.id === id);
+  if (!ex) return;
+  ex.qty += d;
+  if (ex.qty <= 0) cart = cart.filter(x => x.id !== id);
+  updateCount();
+  renderCart();
+}
+
+function updateCount() {
+  document.getElementById('cart-count').textContent = cart.reduce((a, x) => a + x.qty, 0);
+}
+
+function renderCart() {
+  const body = document.getElementById('cart-body');
+  if (!cart.length) {
+    body.innerHTML = `<div class="cart-empty">
+      <span class="cart-empty-icon">🛍</span>
+      <p class="cart-empty-text">Tu bolsa está vacía.</p>
+    </div>`;
+    return;
+  }
+  const sub = cart.reduce((a, x) => a + x.price * x.qty, 0);
+  const envio = sub >= 80000 ? 0 : 6500;
+  const total = sub + envio;
+  const cuota = Math.round(total / 12);
+
+  body.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="ci-img">${item.emoji}</div>
+      <div class="ci-info">
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-variant">Talle: ${item.talle.split(' / ')[0]}</div>
+        <div class="ci-price">${fmt(item.price)} c/u</div>
+      </div>
+      <div class="ci-right">
+        <div class="ci-subtotal">${fmt(item.price * item.qty)}</div>
+        <div class="qty-row">
+          <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
+        </div>
+      </div>
+    </div>`).join('') + `
+  <div class="cart-summary">
+    <div class="sum-row"><span>Subtotal</span><span>${fmt(sub)}</span></div>
+    <div class="sum-row"><span>Envío</span><span>${envio === 0 ? '<span class="sum-envio">Gratis 🎉</span>' : fmt(envio)}</span></div>
+    <div class="sum-total">
+      <span class="sum-total-label">Total</span>
+      <span class="sum-total-val">${fmt(total)}</span>
+    </div>
+    <button class="mp-btn" onclick="showToast('✓  Redirigiendo a Mercado Pago...')">
+      Pagar con <span class="mp-logo">MP</span>
+    </button>
+    <div class="cuotas-box">
+      💳 12 cuotas sin interés de <strong>${fmt(cuota)}</strong> con tarjetas seleccionadas
+    </div>
+    <p class="mp-note">Pagá con tarjeta, débito, dinero en cuenta o Pago Fácil / Rapipago</p>
+  </div>`;
+}
+
+function showView(id, el) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('v-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  if (id === 'cart') renderCart();
+  if (id === 'lookbook') renderLookbook();
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+renderProducts();
+</script>
+</body>
+</html>
